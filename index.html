@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Antalya Heat | Premium Fast Food</title>
+    
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Montserrat (including weight 900 for "Black") -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <!-- Cinzel Decorative for "ANTALYA" -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- RESET & BASICS --- */
+        :root {
+            --primary: #FF8C00; /* Dark Orange */
+            --primary-glow: #FFA500;
+            --bg-dark: #121212; 
+            --bg-card: #1e1e1e;
+            --accent-red: #D32F2F;
+            --accent-yellow: #FBC02D;
+            --glass-bg: rgba(20, 20, 20, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-white: #F5F5F5;
+            --text-gray: #B0B0B0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Hiding default cursor globally */
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* --- CUSTOM CURSOR --- */
+        #custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.1s ease; /* Removed opacity transition for snappier feel */
+        }
+
+        /* Default Burger State */
+        #custom-cursor .cursor-icon {
+            font-size: 24px;
+            transition: all 0.2s ease;
+        }
+        
+        #custom-cursor .star-icon {
+            font-size: 0;
+            color: var(--primary-glow);
+            text-shadow: 0 0 15px var(--primary);
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        /* Clicked Star State */
+        #custom-cursor.active .cursor-icon {
+            font-size: 0;
+            opacity: 0;
+        }
+
+        #custom-cursor.active .star-icon {
+            font-size: 35px;
+            opacity: 1;
+            animation: spin 0.5s ease forwards;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg) scale(0.8); }
+            100% { transform: rotate(180deg) scale(1.2); }
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.8rem;
+            color: var(--text-white);
+            letter-spacing: -1px;
+            /* Added transition for the pop and glow effect */
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), text-shadow 0.3s ease;
+        }
+
+        /* Added Logo Hover Effect */
+        .logo:hover {
+            transform: scale(1.1);
+            text-shadow: 0 0 20px var(--primary), 0 0 40px var(--primary-glow);
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        /* The Exotic Part */
+        .logo-text-exotic {
+            font-family: 'Cinzel Decorative', cursive;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* The Modern Bold Part */
+        .logo-text-modern {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900; /* Black weight */
+            color: var(--primary);
+            /* Removed font-style: italic; */
+            margin-left: 5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-white);
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Mobile Burger Menu Icon */
+        .burger-menu-icon {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: none;
+            z-index: 1002;
+        }
+
+        .line {
+            width: 30px;
+            height: 3px;
+            background-color: var(--text-white);
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        /* --- HERO SECTION --- */
+        #hero {
+            position: relative;
+            width: 100%;
+            margin-top: 0; 
+            height: 100vh; /* Full viewport height */
+            overflow: hidden;
+            border-bottom: 4px solid var(--primary);
+        }
+
+        #hero-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Gradient from bottom (50% opacity black) to middle (transparent) */
+            background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 50%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .hero-text {
+            position: absolute;
+            bottom: 15%;
+            left: 5%;
+            z-index: 3;
+            max-width: 600px;
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            line-height: 1;
+            text-transform: uppercase;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+        }
+        
+        .hero-text h1 span {
+             color: var(--primary);
+             text-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
+        }
+
+        .hero-text p {
+            font-size: 1.3rem;
+            color: #ddd;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+        }
+
+        /* --- SECTIONS GENERAL --- */
+        section {
+            padding: 80px 5%;
+            position: relative;
+        }
+
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 50px;
+            text-align: center;
+            color: var(--text-white);
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+        
+        h2 span {
+            color: var(--primary);
+            background: linear-gradient(120deg, var(--primary), var(--accent-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- ABOUT --- */
+        #about {
+            background: radial-gradient(circle at top center, #2a2a2a, var(--bg-dark));
+            text-align: center;
+        }
+
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: var(--text-gray);
+            border-left: 3px solid var(--primary);
+            padding-left: 20px;
+            text-align: left;
+        }
+        
+        .about-tags {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .tag {
+            background: rgba(255, 140, 0, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* --- PRODUCTS --- */
+        #products {
+            background-color: #0a0a0a;
+            overflow: hidden;
+        }
+
+        .products-wrapper {
+            display: flex;
+            overflow-x: auto;
+            gap: 30px;
+            padding: 20px 10px 40px 10px;
+            /* Removed scroll-snap for smoother PC experience */
+            /* scroll-snap-type: x mandatory; */ 
+            scrollbar-width: none; /* Firefox */
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .products-wrapper::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .product-card {
+            min-width: 300px;
+            max-width: 300px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            overflow: hidden;
+            /* scroll-snap-align: center; */ /* Removed for smooth flow */
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 140, 0, 0.2);
+        }
+
+        .product-img-box {
+            height: 300px; /* Increased height for 1:1 images */
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            background-color: #222; /* Placeholder color */
+        }
+
+        .product-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s;
+        }
+
+        .product-card:hover .product-img-box img {
+            transform: scale(1.15);
+        }
+        
+        .price-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary);
+            color: #000;
+            font-weight: 800;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+
+        .product-info {
+            padding: 20px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-info h3 {
+            color: var(--text-white);
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .product-info p {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            margin-bottom: 5px;
+        }
+
+        .menu-cta {
+            margin-top: 60px;
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #151515, #222);
+            border-radius: 15px;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menu-cta h3 {
+            color: var(--text-white);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .pulsating-arrow {
+            margin-top: 25px;
+            color: var(--primary);
+            font-size: 1.8rem;
+            text-decoration: none;
+            animation: pulse-glow 2s infinite ease-in-out;
+            display: inline-block;
+            cursor: none;
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                transform: scale(1);
+                text-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.2) translateY(5px);
+                text-shadow: 0 0 20px rgba(255, 140, 0, 1), 0 0 30px rgba(255, 69, 0, 0.6);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                text-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
+                opacity: 0.8;
+            }
+        }
+
+        /* --- LOCATION (MAP) --- */
+        #location {
+            background: var(--bg-dark);
+        }
+
+        .map-container {
+            width: 100%;
+            height: 450px;
+            border-radius: 20px;
+            overflow: hidden;
+            filter: grayscale(100%) invert(100%) contrast(90%) brightness(90%); 
+            border: 1px solid #333;
+            position: relative;
+        }
+        
+        .map-overlay {
+            pointer-events: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.7);
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* --- CONTACT --- */
+        #contact {
+            background: linear-gradient(to top, #000, #121212);
+            text-align: center;
+            padding-bottom: 120px;
+        }
+
+        .contact-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 25px 50px;
+            border: 2px solid var(--primary);
+            border-radius: 50px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(255, 140, 0, 0.05);
+        }
+
+        .contact-box:hover {
+            background: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 140, 0, 0.4);
+        }
+        
+        .contact-box:hover .email-link {
+            color: #000;
+        }
+        
+        .contact-box i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            transition: 0.3s;
+        }
+        
+        .contact-box:hover i {
+            color: #000;
+        }
+
+        .email-link {
+            font-size: 1.5rem;
+            color: var(--text-white);
+            text-decoration: none;
+            font-weight: 800;
+            transition: 0.3s;
+        }
+
+        /* --- POPUP TOAST --- */
+        #toast {
+            visibility: hidden;
+            min-width: 280px;
+            background-color: var(--primary);
+            color: #000;
+            text-align: center;
+            border-radius: 50px;
+            padding: 16px;
+            position: fixed;
+            z-index: 10000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%) translateY(20px);
+            font-size: 16px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(255, 140, 0, 0.4);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media screen and (max-width: 1024px) {
+             h2 { font-size: 2.5rem; }
+             .hero-text h1 { font-size: 3rem; }
+        }
+
+        @media screen and (max-width: 768px) {
+            
+            .burger-menu-icon {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                right: -100%;
+                top: 0;
+                height: 100vh;
+                width: 100%;
+                background: rgba(10, 10, 10, 0.98);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                transition: 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+                z-index: 1001;
+                gap: 50px;
+            }
+
+            .nav-links.nav-active {
+                right: 0;
+            }
+            
+            .nav-links a {
+                font-size: 1.5rem;
+            }
+
+            .burger-menu-icon.toggle .line:nth-child(1) {
+                transform: rotate(-45deg) translate(-5px, 6px);
+                background-color: var(--primary);
+            }
+            .burger-menu-icon.toggle .line:nth-child(2) {
+                opacity: 0;
+            }
+            .burger-menu-icon.toggle .line:nth-child(3) {
+                transform: rotate(45deg) translate(-5px, -6px);
+                background-color: var(--primary);
+            }
+
+            #hero {
+                height: 80vh; 
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-text p {
+                font-size: 1rem;
+            }
+            
+            h2 {
+                font-size: 2rem;
+            }
+
+            /* ADDED: Fix for email overflow on mobile */
+            .contact-box {
+                width: 90%; /* Adapts to screen width */
+                max-width: 350px; /* Prevents it from getting too wide */
+                padding: 15px; /* Reduced padding */
+                flex-direction: column; /* Stacks icon on top of text */
+                gap: 10px;
+                border-radius: 25px;
+            }
+
+            .email-link {
+                font-size: 1rem; /* Smaller font size for mobile */
+                word-break: break-word; /* Ensures long emails wrap if necessary */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor -->
+    <div id="custom-cursor">
+        <div class="cursor-icon">🍔</div>
+        <div class="star-icon">✦</div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast">
+        <i class="fas fa-check-circle"></i> Email copied to clipboard!
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <i class="fas fa-fire"></i>
+            <!-- Split Logo: Exotic for Antalya, Bold Modern for Heat -->
+            <div class="logo-text-exotic">ANTALYA</div>
+            <div class="logo-text-modern">HEAT</div>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#products">Menu</a></li>
+            <li><a href="#location">Location</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+
+        <div class="burger-menu-icon">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Video) -->
+    <section id="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-text">
+            <h1>Taste The <span>Heat</span></h1>
+            <p>Authentic Turkish flavors meeting modern speed in the heart of Antalya.</p>
+        </div>
+        <!-- Local video file: hero.mp4 -->
+        <video autoplay muted loop playsinline id="hero-video">
+            <source src="hero.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <h2>Our <span>Story</span></h2>
+        <div class="about-content">
+            <p>Born in the heart of Antalya, <strong>Antalya Heat</strong> merges traditional Turkish spices with the modern speed of urban life. We believe fast food doesn't have to mean low quality.</p>
+            <br>
+            <p>From our flame-grilled meats to our locally sourced vegetables, every bite captures the heat and soul of the Mediterranean coast. We are not just a restaurant; we are a culinary destination for those who seek flavor without compromise.</p>
+            
+            <div class="about-tags">
+                <div class="tag">#AntalyaFood</div>
+                <div class="tag">#FreshIngredients</div>
+                <div class="tag">#Halal</div>
+                <div class="tag">#FastService</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products">
+        <h2>Most <span>Wanted</span></h2>
+        
+        <div class="products-wrapper" id="scroll-container">
+            
+            <!-- Product 1 -->
+            <div class="product-card">
+                <div class="price-tag">$8.50</div>
+                <div class="product-img-box">
+                    <!-- UPDATED TO .PNG -->
+                    <img src="products/1.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+1+Not+Found'" alt="Burger">
+                </div>
+                <div class="product-info">
+                    <h3>Spicy Heat Burger</h3>
+                    <p>Beef patty with hot turkish peppers and melted cheddar.</p>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-card">
+                <div class="price-tag">$6.00</div>
+                <div class="product-img-box">
+                    <img src="products/2.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+2+Not+Found'" alt="Wrap">
+                </div>
+                <div class="product-info">
+                    <h3>Antalya Wrap</h3>
+                    <p>Classic chicken shawarma with garlic sauce.</p>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-card">
+                <div class="price-tag">$12.00</div>
+                <div class="product-img-box">
+                    <img src="products/3.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+3+Not+Found'" alt="Kebab">
+                </div>
+                <div class="product-info">
+                    <h3>Adana Skewers</h3>
+                    <p>Spicy minced meat grilled on a wide iron skewer.</p>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-card">
+                <div class="price-tag">$4.50</div>
+                <div class="product-img-box">
+                    <img src="products/4.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+4+Not+Found'" alt="Fries">
+                </div>
+                <div class="product-info">
+                    <h3>Cajun Fries</h3>
+                    <p>Crispy fries dusted with our secret cajun spice mix.</p>
+                </div>
+            </div>
+            
+            <!-- Product 5 -->
+            <div class="product-card">
+                <div class="price-tag">$9.00</div>
+                <div class="product-img-box">
+                    <img src="products/5.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+5+Not+Found'" alt="Lahmacun">
+                </div>
+                <div class="product-info">
+                    <h3>Lahmacun Bites</h3>
+                    <p>Thin Turkish pizza with minced meat and herbs.</p>
+                </div>
+            </div>
+
+            <!-- Product 6 -->
+            <div class="product-card">
+                <div class="price-tag">$5.00</div>
+                <div class="product-img-box">
+                    <img src="products/6.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+6+Not+Found'" alt="Wings">
+                </div>
+                <div class="product-info">
+                    <h3>Hot Wings</h3>
+                    <p>6 pcs chicken wings glazed in honey sriracha.</p>
+                </div>
+            </div>
+
+            <!-- Product 7 -->
+            <div class="product-card">
+                <div class="price-tag">$3.00</div>
+                <div class="product-img-box">
+                    <img src="products/7.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+7+Not+Found'" alt="Baklava">
+                </div>
+                <div class="product-info">
+                    <h3>Pistachio Baklava</h3>
+                    <p>Traditional sweet pastry layered with nuts.</p>
+                </div>
+            </div>
+
+            <!-- Product 8 -->
+            <div class="product-card">
+                <div class="price-tag">$2.50</div>
+                <div class="product-img-box">
+                    <img src="products/8.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+8+Not+Found'" alt="Ayran">
+                </div>
+                <div class="product-info">
+                    <h3>Fresh Ayran</h3>
+                    <p>Cold yogurt drink with mint foam.</p>
+                </div>
+            </div>
+
+             <!-- Product 9 -->
+             <div class="product-card">
+                <div class="price-tag">$14.50</div>
+                <div class="product-img-box">
+                    <img src="products/9.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+9+Not+Found'" alt="Platter">
+                </div>
+                <div class="product-info">
+                    <h3>Sultan Platter</h3>
+                    <p>A mix of everything for the hungry ones.</p>
+                </div>
+            </div>
+
+             <!-- Product 10 -->
+             <div class="product-card">
+                <div class="price-tag">$7.00</div>
+                <div class="product-img-box">
+                    <img src="products/10.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+10+Not+Found'" alt="Pide">
+                </div>
+                <div class="product-info">
+                    <h3>Pide Special</h3>
+                    <p>Boat shaped dough with sucuk and egg.</p>
+                </div>
+            </div>
+
+             <!-- Product 11 -->
+             <div class="product-card">
+                <div class="price-tag">$4.00</div>
+                <div class="product-img-box">
+                    <img src="products/11.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+11+Not+Found'" alt="Manti">
+                </div>
+                <div class="product-info">
+                    <h3>Manti</h3>
+                    <p>Turkish dumplings with yogurt garlic sauce.</p>
+                </div>
+            </div>
+
+             <!-- Product 12 -->
+             <div class="product-card">
+                <div class="price-tag">$3.50</div>
+                <div class="product-img-box">
+                    <img src="products/12.png" onerror="this.src='https://via.placeholder.com/300x300/111/FF8C00?text=Image+12+Not+Found'" alt="Tea">
+                </div>
+                <div class="product-info">
+                    <h3>Turkish Tea</h3>
+                    <p>Authentic strong black tea.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="menu-cta">
+            <h3>Hungry for more?</h3>
+            <p style="color: #aaa;">Come visit our location to explore the full menu and seasonal specials.</p>
+            
+            <!-- Pulsating Arrow -->
+            <a href="#location" class="pulsating-arrow">
+                <i class="fas fa-chevron-down"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Location Section -->
+    <section id="location">
+        <h2>Find <span>Us</span></h2>
+        <div class="map-container">
+            <div class="map-overlay"></div>
+            <!-- Google Map Embed centered on Antalya -->
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d101886.29633560366!2d30.61757788379922!3d36.88480282245586!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14c39aaeddadadc1%3A0x95c69f73f9e32e33!2sAntalya%2C%20T%C3%BCrkiye!5e0!3m2!1sen!2sro!4v1708523456789!5m2!1sen!2sro" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2>Contact <span>Us</span></h2>
+        <div class="contact-box" id="email-btn">
+            <i class="far fa-envelope"></i>
+            <a href="#" class="email-link" onclick="return false;">contact@antalyaheat.com</a>
+        </div>
+        <p style="margin-top: 30px; color: #666; font-size: 0.8rem; letter-spacing: 1px;">&copy; 2024 ANTALYA HEAT. ALL RIGHTS RESERVED.</p>
+    </section>
+
+    <script>
+        // --- CURSOR LOGIC ---
+        const cursor = document.getElementById('custom-cursor');
+
+        // Simple mouse follow
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Mouse Down Effect (Burger to Star)
+        document.addEventListener('mousedown', () => {
+            cursor.classList.add('active');
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursor.classList.remove('active');
+        });
+
+        // Hide cursor when leaving window
+        document.addEventListener('mouseleave', () => {
+            cursor.style.display = 'none';
+        });
+        document.addEventListener('mouseenter', () => {
+            cursor.style.display = 'flex';
+        });
+
+
+        // --- MOBILE MENU LOGIC ---
+        const burger = document.querySelector('.burger-menu-icon');
+        const nav = document.querySelector('.nav-links');
+        const navLinks = document.querySelectorAll('.nav-links li');
+
+        burger.addEventListener('click', () => {
+            nav.classList.toggle('nav-active');
+            burger.classList.toggle('toggle');
+        });
+
+        // Close menu when a link is clicked
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('nav-active');
+                burger.classList.remove('toggle');
+            });
+        });
+
+
+        // --- EMAIL COPY LOGIC ---
+        const emailBtn = document.getElementById('email-btn');
+        const emailAddress = "contact@antalyaheat.com";
+        const toast = document.getElementById('toast');
+
+        emailBtn.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            
+            // Fallback for older browsers
+            if (!navigator.clipboard) {
+                 alert("Clipboard API not supported, please copy manually: " + emailAddress);
+                 return;
+            }
+
+            navigator.clipboard.writeText(emailAddress).then(() => {
+                // Show Toast
+                toast.classList.add("show");
+                setTimeout(function(){ toast.classList.remove("show"); }, 3000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        });
+        
+        // --- Horizontal Scroll with Mouse Wheel (PC SMOOTH) ---
+        const scrollContainer = document.getElementById("scroll-container");
+
+        scrollContainer.addEventListener("wheel", (evt) => {
+            evt.preventDefault();
+            
+            // Just scroll by deltaY (smoother than snapping)
+            scrollContainer.scrollLeft += evt.deltaY;
+        });
+
+    </script>
+</body>
+</html>
